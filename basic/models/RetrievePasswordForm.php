@@ -11,15 +11,20 @@ use yii\helpers\Url;
  */
 class RetrievePasswordForm extends Model
 {
+    /**
+     * @var string
+     */
     public $email;
 
+    /**
+     * @var User|bool
+     */
     private $_user = false;
-
 
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['email'], 'required'],
@@ -39,14 +44,15 @@ class RetrievePasswordForm extends Model
                 ->setTo($this->email)
                 ->setSubject('Recovery password')
                 ->setTextBody($text)
-                ->send();
+                ->send()
+            ;
         }
     }
 
     /**
      * @return User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         if ($this->_user === false) {
             $this->_user = User::findByEmail($this->email);

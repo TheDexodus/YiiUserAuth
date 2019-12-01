@@ -9,25 +9,28 @@ use yii\db\Schema;
 class m190826_183942_start extends Migration
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function safeUp()
+    public function safeUp(): void
     {
-        $this->createTable('users', [
-            'id' => $this->primaryKey(11),
-            'username' => $this->string(64)->notNull(),
-            'email' => $this->string(64)->notNull(),
-            'displayname' => $this->string(64)->notNull(),
-            'password' => $this->string(64)->notNull(),
-            'authKey' => $this->string(64)->notNull(),
-            'resetKey' => $this->string(64)->notNull(),
-        ]);
-
+        $this->createTable(
+            'users',
+            [
+                'id'          => $this->primaryKey(11),
+                'username'    => $this->string(64)->notNull()->unique(),
+                'email'       => $this->string(64)->notNull()->unique(),
+                'displayname' => $this->string(64)->notNull(),
+                'password'    => $this->string(64)->notNull(),
+                'authKey'     => $this->string(64)->notNull(),
+                'resetKey'    => $this->string(64)->notNull(),
+            ]
+        );
     }
+
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    public function safeDown()
+    public function safeDown(): bool
     {
         echo "m190826_183942_start cannot be reverted.\n";
 

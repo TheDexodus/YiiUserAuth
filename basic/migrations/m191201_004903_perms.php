@@ -8,10 +8,11 @@ use yii\db\Migration;
 class m191201_004903_perms extends Migration
 {
     /**
-     * {@inheritdoc}
+     * @return void
+     *
      * @throws Exception
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $auth = Yii::$app->authManager;
 
@@ -25,9 +26,9 @@ class m191201_004903_perms extends Migration
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    public function safeDown()
+    public function safeDown(): bool
     {
         echo "m191201_004903_perms cannot be reverted.\n";
 

@@ -2,10 +2,16 @@
 
 namespace app\models;
 
+use Throwable;
 use Yii;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\BaseActiveRecord;
 use yii\db\Query;
+use yii\db\StaleObjectException;
 use yii\web\IdentityInterface;
 
 /**
@@ -24,9 +30,12 @@ class User extends ActiveRecord implements IdentityInterface
 {
     const SCENARIO_LOGIN    = 'login';
     const SCENARIO_REGISTER = 'register';
-    const SCENARIO_CREATE = 'create';
+    const SCENARIO_CREATE   = 'create';
 
-    public function rules()
+    /**
+     * @return array
+     */
+    public function rules(): array
     {
         return [
             [['username', 'password', 'permissions'], 'required', 'on' => self::SCENARIO_LOGIN],
@@ -43,7 +52,10 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    public function fields()
+    /**
+     * @return array
+     */
+    public function fields(): array
     {
         return [
             'displayname' => 'displayname',
@@ -51,64 +63,80 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * @inheritdoc
+     * @param int|string $id
+     *
+     * @return User|null
      */
-    public static function findIdentity($id)
+    public static function findIdentity($id): ?User
     {
         return static::findOne(['id' => $id]);
     }
 
-    public static function findByEmail($email)
+    /**
+     * @param string $email
+     *
+     * @return User|null
+     */
+    public static function findByEmail(string $email): ?User
     {
         return static::findOne(['email' => $email]);
     }
 
-    public static function findByResetKey($resetKey)
+    /**
+     * @param string $resetKey
+     *
+     * @return User|null
+     */
+    public static function findByResetKey(string $resetKey): ?User
     {
         return static::findOne(['resetKey' => $resetKey]);
     }
 
     /**
-     * @inheritdoc
+     * @param mixed $token
+     * @param null  $type
+     *
+     * @return void
+     *
      * @throws NotSupportedException
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public static function findIdentityByAccessToken($token, $type = null): void
     {
         throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
     }
 
     /**
-     * Finds user by username
-     *
      * @param string $username
      *
-     * @return static|null
+     * @return User|null
      */
-    public static function findByUsername($username)
+    public static function findByUsername(string $username): ?User
     {
         return static::findOne(['username' => $username]);
     }
 
     /**
-     * @inheritdoc
+     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->getPrimaryKey();
     }
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function getAuthKey()
+    public function getAuthKey(): string
     {
         return $this->authKey;
     }
 
     /**
-     * @inheritdoc
+     * @param string $authKey
+     *
+     * @return bool
      */
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authKey): bool
     {
         return $this->getAuthKey() === $authKey;
     }
@@ -120,7 +148,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return bool if password provided is valid for current user
      */
-    public function validatePassword($password)
+    public function validatePassword(string $password): bool
     {
         return Yii::$app->getSecurity()->validatePassword($password, $this->password);
     }
@@ -130,17 +158,23 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @param string $password
      *
-     * @throws \yii\base\Exception
+     * @return void
+     *
+     * @throws Exception
      */
-    public function setPassword($password)
+    public function setPassword(string $password): void
     {
         $this->password = Yii::$app->getSecurity()->generatePasswordHash($password);
     }
 
     /**
      * Generates "remember me" authentication key
+     *
+     * @return void
+     *
+     * @throws Exception
      */
-    public function generateAuthKey()
+    public function generateAuthKey(): void
     {
         $this->authKey = Yii::$app->security->generateRandomString();
     }
@@ -148,40 +182,62 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return string
      */
-    public function getResetKey()
+    public function getResetKey(): string
     {
         return $this->resetKey;
     }
 
     /**
-     * @param $resetKey
+     * @param string $resetKey
      *
      * @return bool
      */
-    public function validateResetKey($resetKey)
+    public function validateResetKey(string $resetKey): bool
     {
         return $this->getResetKey() === $resetKey;
     }
 
-    public function generateResetKey()
+    /**
+     * @return void
+     * @throws Exception
+     *
+     */
+    public function generateResetKey(): void
     {
         $this->resetKey = Yii::$app->security->generateRandomString();
     }
 
-    public function getPermissions()
+    /**
+     * @return ActiveQuery
+     *
+     * @throws InvalidConfigException
+     */
+    public function getPermissions(): ActiveQuery
     {
         return $this->hasMany(AuthItem::class, ['name' => 'item_name'])
             ->viaTable('auth_assignment', ['user_id' => 'id'])
             ;
     }
 
-    public function removePermission($permName): void
+    /**
+     * @param string $permName
+     *
+     * @return void
+     *
+     * @throws \yii\db\Exception
+     */
+    public function removePermission(string $permName): void
     {
         (new Query())->createCommand()
             ->delete('auth_assignment', ['user_id' => $this->getId(), 'item_name' => $permName])->execute()
         ;
     }
 
+    /**
+     * @return void
+     *
+     * @throws \yii\db\Exception
+     */
     public function removeAllPermissions(): void
     {
         (new Query())->createCommand()
@@ -189,7 +245,14 @@ class User extends ActiveRecord implements IdentityInterface
         ;
     }
 
-    public function addPermission($permName): void
+    /**
+     * @param string $permName
+     *
+     * @return void
+     *
+     * @throws \yii\db\Exception
+     */
+    public function addPermission(string $permName): void
     {
         (new Query())->createCommand()
             ->insert('auth_assignment', ['user_id' => $this->getId(), 'item_name' => $permName, 'created_at' => time()])
@@ -197,6 +260,12 @@ class User extends ActiveRecord implements IdentityInterface
         ;
     }
 
+    /**
+     * @return false|int
+     *
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function delete()
     {
         $auths = Auth::findAll(['user_id' => $this->getId()]);
@@ -208,9 +277,9 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'users';
     }

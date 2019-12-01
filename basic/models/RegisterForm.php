@@ -3,28 +3,45 @@
 namespace app\models;
 
 use Yii;
+use yii\base\Exception;
 use yii\base\Model;
 
 /**
  * @property User|null $user This property is read-only.
- *
  */
 class RegisterForm extends Model
 {
+    /**
+     * @var string
+     */
     public $displayName;
+
+    /**
+     * @var string
+     */
     public $email;
+
+    /**
+     * @var string
+     */
     public $username;
+
+    /**
+     * @var string
+     */
     public $password;
 
+    /**
+     * @var User|bool
+     */
     private $_user = false;
 
     /**
-     * @return array the validation rules.
+     * {@inheritDoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            // username and password are both required
             [['username', 'password', 'email', 'displayName'], 'required'],
             ['email', 'email'],
             ['username', 'validateUsername'],
@@ -32,7 +49,13 @@ class RegisterForm extends Model
         ];
     }
 
-    public function validatePassword($attribute, $params)
+    /**
+     * @param string     $attribute
+     * @param null|array $params
+     *
+     * @return void
+     */
+    public function validatePassword(string $attribute, ?array $params): void
     {
         if (!$this->hasErrors()) {
             if (preg_match_all('/[a-z]/i', $this->password) < 2
@@ -44,7 +67,13 @@ class RegisterForm extends Model
         }
     }
 
-    public function validateUsername($attribute, $params)
+    /**
+     * @param string     $attribute
+     * @param null|array $params
+     *
+     * @return void
+     */
+    public function validateUsername(string $attribute, ?array $params): void
     {
         if (!$this->hasErrors()) {
             if (!preg_match('/^[a-zA-Z0-9]+$/i', $this->username)) {
@@ -54,8 +83,10 @@ class RegisterForm extends Model
     }
 
     /**
-     * @return bool
-     * @throws \yii\base\Exception
+     * @return mixed
+     *
+     * @throws Exception
+     * @throws \yii\db\Exception
      */
     public function signup()
     {
@@ -83,7 +114,7 @@ class RegisterForm extends Model
      *
      * @return User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         if ($this->_user === false) {
             $this->_user = User::findByUsername($this->username);

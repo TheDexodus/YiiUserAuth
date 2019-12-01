@@ -2,13 +2,17 @@
 
 namespace app\controllers;
 
+use Throwable;
 use Yii;
 use app\models\User;
 use yii\data\ActiveDataProvider;
+use yii\db\Exception;
+use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * AdminPanelController implements the CRUD actions for User model.
@@ -16,13 +20,13 @@ use yii\filters\VerbFilter;
 class AdminPanelController extends Controller
 {
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
+            'verbs'  => [
+                'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -31,9 +35,9 @@ class AdminPanelController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => true,
+                        'allow'   => true,
                         'actions' => ['index', 'view', 'create', 'update', 'delete'],
-                        'roles' => ['admin'],
+                        'roles'   => ['admin'],
                     ],
                 ],
             ],
@@ -42,9 +46,10 @@ class AdminPanelController extends Controller
 
     /**
      * Lists all User models.
-     * @return mixed
+     *
+     * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $dataProvider = new ActiveDataProvider(
             [
@@ -65,10 +70,11 @@ class AdminPanelController extends Controller
      *
      * @param integer $id
      *
-     * @return mixed
+     * @return string
+     *
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
         return $this->render(
             'view',
@@ -81,7 +87,10 @@ class AdminPanelController extends Controller
     /**
      * Creates a new User model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     *
+     * @return Response|string
+     *
+     * @throws Exception
      */
     public function actionCreate()
     {
@@ -107,10 +116,12 @@ class AdminPanelController extends Controller
      *
      * @param integer $id
      *
-     * @return mixed
+     * @return Response|string
+     *
      * @throws NotFoundHttpException if the model cannot be found
+     * @throws Exception
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
 
@@ -135,12 +146,13 @@ class AdminPanelController extends Controller
      *
      * @param integer $id
      *
-     * @return mixed
+     * @return Response
+     *
      * @throws NotFoundHttpException if the model cannot be found
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
-    public function actionDelete($id)
+    public function actionDelete(int $id): Response
     {
         /** @var User $model */
         $model = $this->findModel($id);
@@ -157,9 +169,10 @@ class AdminPanelController extends Controller
      * @param integer $id
      *
      * @return User the loaded model
+     *
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel(int $id): User
     {
         if (($model = User::findOne($id)) !== null) {
             return $model;
@@ -170,6 +183,10 @@ class AdminPanelController extends Controller
 
     /**
      * @param User $model
+     *
+     * @return void
+     *
+     * @throws Exception
      */
     private function editPerms(User $model): void
     {
@@ -177,7 +194,6 @@ class AdminPanelController extends Controller
             : Yii::$app->request->post()['User']['permissions'];
         $userPerms = Yii::$app->authManager->getPermissionsByUser($model->getId());
         $allPerms = Yii::$app->authManager->getPermissions();
-        $auth = Yii::$app->authManager;
 
         $valUserPerms = [];
         foreach ($userPerms as $value) {

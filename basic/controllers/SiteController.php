@@ -17,14 +17,16 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
 
+/**
+ * Class SiteController
+ */
 class SiteController extends Controller
 {
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -53,9 +55,9 @@ class SiteController extends Controller
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function actions()
+    public function actions(): array
     {
         return [
             'error' => [
@@ -72,7 +74,7 @@ class SiteController extends Controller
     /**
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         return $this->render('index');
     }
@@ -122,9 +124,10 @@ class SiteController extends Controller
     }
 
     /**
-     * @param string|null $rec
+     * @param string $rec
      *
      * @return string|Response
+     *
      * @throws NotFoundHttpException
      * @throws Exception
      */
@@ -151,6 +154,7 @@ class SiteController extends Controller
 
     /**
      * @return Response|string
+     *
      * @throws Exception
      */
     public function actionRegister()
@@ -177,7 +181,7 @@ class SiteController extends Controller
     /**
      * @return Response
      */
-    public function actionLogout()
+    public function actionLogout(): Response
     {
         Yii::$app->user->logout();
 
@@ -187,14 +191,16 @@ class SiteController extends Controller
     /**
      * @param $client
      *
+     * @return void
+     *
      * @throws Exception
      */
-    public function oAuthSuccess(ClientInterface $client)
+    public function oAuthSuccess(ClientInterface $client): void
     {
         $userAttributes = $client->getUserAttributes();
         $id = ArrayHelper::getValue($userAttributes, 'id');
         $source = $client->getId();
-        $email = ArrayHelper::getValue($userAttributes, 'email') ?? 'user' . sha1(microtime()).'@email.com';
+        $email = ArrayHelper::getValue($userAttributes, 'email') ?? 'user'.sha1(microtime()).'@email.com';
 
         $auth = Auth::findOne(['source' => $source, 'source_id' => $id]);
 
@@ -206,7 +212,10 @@ class SiteController extends Controller
                 Yii::$app->getSession()->setFlash(
                     'error',
                     [
-                        printf('User with the same email as in %s account already exists but isn\'t linked to it. Login using email first to link it.', $client->getTitle()),
+                        printf(
+                            'User with the same email as in %s account already exists but isn\'t linked to it. Login using email first to link it.',
+                            $client->getTitle()
+                        ),
                     ]
                 )
                 ;

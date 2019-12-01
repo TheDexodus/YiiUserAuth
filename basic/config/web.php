@@ -1,88 +1,89 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
+$params = require __DIR__.'/params.php';
+$db = require __DIR__.'/db.php';
 
 $config = [
-    'id' => 'basic',
-    'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
-    'aliases' => [
+    'id'         => 'basic',
+    'name'       => 'User Auth',
+    'basePath'   => dirname(__DIR__),
+    'bootstrap'  => ['log'],
+    'aliases'    => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
-        'request' => [
+        'request'              => [
             'cookieValidationKey' => '',
         ],
-        'cache' => [
+        'cache'                => [
             'class' => 'yii\caching\FileCache',
         ],
-        'user' => [
-            'identityClass' => 'app\models\User',
+        'user'                 => [
+            'identityClass'   => 'app\models\User',
             'enableAutoLogin' => true,
         ],
-        'authManager' => [
+        'authManager'          => [
             'class' => 'yii\rbac\DbManager',
         ],
-        'errorHandler' => [
+        'errorHandler'         => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+        'mailer'               => [
+            'class'     => 'yii\swiftmailer\Mailer',
             'transport' => [
-                'class' => 'Swift_SmtpTransport',
-                'host' => 'smtp.mail.ru',
-                'username' => '',
-                'password' => '',
-                'port' => '465',
+                'class'      => 'Swift_SmtpTransport',
+                'host'       => 'smtp.mail.ru',
+                'username'   => '',
+                'password'   => '',
+                'port'       => '465',
                 'encryption' => 'ssl',
             ],
         ],
-        'log' => [
+        'log'                  => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
+            'targets'    => [
                 [
-                    'class' => 'yii\log\FileTarget',
+                    'class'  => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
             ],
         ],
-        'db' => $db,
-        'urlManager' => [
+        'db'                   => $db,
+        'urlManager'           => [
             'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'rules' => [
-                'login' => 'site/login',
-                'register' => 'site/register',
+            'showScriptName'  => false,
+            'rules'           => [
+                'login'             => 'site/login',
+                'register'          => 'site/register',
                 'retrieve-password' => 'site/retrieve-password',
-                'change-password' => 'site/change-password',
+                'change-password'   => 'site/change-password',
             ],
         ],
         'authClientCollection' => [
-            'class' => 'yii\authclient\Collection',
+            'class'   => 'yii\authclient\Collection',
             'clients' => [
-                'facebook' => [
-                    'class' => 'yii\authclient\clients\Facebook',
-                    'authUrl' => 'https://www.facebook.com/dialog/oauth?display=popup',
-                    'clientId' => '',
-                    'clientSecret' => '',
+                'facebook'  => [
+                    'class'          => 'yii\authclient\clients\Facebook',
+                    'authUrl'        => 'https://www.facebook.com/dialog/oauth?display=popup',
+                    'clientId'       => '',
+                    'clientSecret'   => '',
                     'attributeNames' => ['name', 'email'],
                 ],
-                'google' => [
-                    'class' => 'yii\authclient\clients\Google',
-                    'clientId' => '',
+                'google'    => [
+                    'class'        => 'yii\authclient\clients\Google',
+                    'clientId'     => '',
                     'clientSecret' => '',
                 ],
                 'vkontakte' => [
-                    'class' => 'yii\authclient\clients\VKontakte',
-                    'clientId' => '',
+                    'class'        => 'yii\authclient\clients\VKontakte',
+                    'clientId'     => '',
                     'clientSecret' => '',
                 ],
             ],
         ],
     ],
-    'params' => $params,
+    'params'     => $params,
 ];
 
 if (YII_ENV_DEV) {
@@ -94,8 +95,8 @@ if (YII_ENV_DEV) {
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
-        'allowedIPs' => ['*']
+        'class'      => 'yii\gii\Module',
+        'allowedIPs' => ['*'],
     ];
 }
 

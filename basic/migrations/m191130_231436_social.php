@@ -8,22 +8,25 @@ use yii\db\Migration;
 class m191130_231436_social extends Migration
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function safeUp()
+    public function safeUp(): void
     {
-        $this->createTable('auth', [
-            'id' => $this->primaryKey(11),
-            'user_id' => $this->integer(11)->notNull(),
-            'source' => $this->string(64)->notNull(),
-            'source_id' => $this->string(64)->notNull(),
-        ]);
+        $this->createTable(
+            'auth',
+            [
+                'id'        => $this->primaryKey(11),
+                'user_id'   => $this->integer(11)->notNull(),
+                'source'    => $this->string(64)->notNull(),
+                'source_id' => $this->string(64)->notNull(),
+            ]
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
-    public function safeDown()
+    public function safeDown(): bool
     {
         echo "m191130_231436_social cannot be reverted.\n";
 

@@ -12,14 +12,20 @@ use yii\helpers\Url;
  */
 class ChangePasswordForm extends Model
 {
+    /**
+     * @var string
+     */
     public $newpassword;
 
+    /**
+     * @var User|bool
+     */
     private $_user = false;
 
     /**
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['newpassword'], 'required'],
@@ -30,6 +36,7 @@ class ChangePasswordForm extends Model
      * @param User $user
      *
      * @return bool
+     *
      * @throws Exception
      */
     public function change(User $user): bool
@@ -48,7 +55,7 @@ class ChangePasswordForm extends Model
     /**
      * @return User|null
      */
-    public function getUser()
+    public function getUser(): ?User
     {
         if ($this->_user === false) {
             $this->_user = User::findByEmail($this->email);
