@@ -104,8 +104,6 @@ class RegisterForm extends Model
         $user->generateAuthKey();
         $this->_user = $user->save();
 
-        $user->addPermission('active');
-
         return $this->_user;
     }
 
