@@ -189,6 +189,29 @@ class SiteController extends Controller
     }
 
     /**
+     * @param string $email
+     * @param string $confirmToken
+     *
+     * @return Response
+     * @throws NotFoundHttpException
+     * @throws \yii\db\Exception
+     */
+    public function actionConfirmEmail(string $email, string $confirmToken): Response
+    {
+        $user = User::findByEmail($email);
+
+        if (!$user instanceof User || !$user->validateConfirmToken($confirmToken)) {
+            throw new NotFoundHttpException();
+        }
+
+        $user->confirm_token = '';
+        $user->addPermission('active');
+        $user->save();
+
+        return $this->goHome();
+    }
+
+    /**
      * @param $client
      *
      * @return void

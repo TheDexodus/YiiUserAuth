@@ -39,11 +39,12 @@ class RetrievePasswordForm extends Model
         if ($this->validate() && $this->getUser() !== null) {
             $link = sprintf('%s/change-password?rec=%s', Url::base('http'), $this->getUser()->getResetKey());
             $text = sprintf('Recovery password: <a href="%s">%s</a>', $link, $link);
+
             Yii::$app->mailer->compose()
-                ->setFrom('user-auth@mail.ru')
+                ->setFrom(Yii::$app->params['senderEmail'])
                 ->setTo($this->email)
                 ->setSubject('Recovery password')
-                ->setTextBody($text)
+                ->setHtmlBody($text)
                 ->send()
             ;
         }

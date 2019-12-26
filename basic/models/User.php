@@ -24,6 +24,7 @@ use yii\web\IdentityInterface;
  * @property string     $password
  * @property string     $authKey
  * @property string     $resetKey
+ * @property string     $confirm_token
  * @property AuthItem[] $permissions
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -188,6 +189,14 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @return string
+     */
+    public function getConfirmToken(): string
+    {
+        return $this->confirm_token;
+    }
+
+    /**
      * @param string $resetKey
      *
      * @return bool
@@ -198,6 +207,16 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @param string $confirmToken
+     *
+     * @return bool
+     */
+    public function validateConfirmToken(string $confirmToken): bool
+    {
+        return $this->getConfirmToken() === $confirmToken;
+    }
+
+    /**
      * @return void
      * @throws Exception
      *
@@ -205,6 +224,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function generateResetKey(): void
     {
         $this->resetKey = Yii::$app->security->generateRandomString();
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     *
+     */
+    public function generateConfirmToken(): void
+    {
+        $this->confirm_token = Yii::$app->security->generateRandomString();
     }
 
     /**

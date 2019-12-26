@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\Exception;
 use yii\base\Model;
+use yii\helpers\Url;
 
 /**
  * @property User|null $user This property is read-only.
@@ -102,7 +103,19 @@ class RegisterForm extends Model
         $user->setPassword($this->password);
         $user->generateResetKey();
         $user->generateAuthKey();
+        $user->generateConfirmToken();
         $this->_user = $user->save();
+
+        $link = sprintf('%s/confirm-email?email=%s&confirmToken=%s', Url::base('http'), $user->email, $user->getConfirmToken());
+        $text = sprintf('Confirm password: <a href="%s">%s</a>', $link, $link);
+
+        Yii::$app->mailer->compose()
+            ->setFrom(Yii::$app->params['senderEmail'])
+            ->setTo($this->email)
+            ->setSubject('Confirm password')
+            ->setHtmlBody($text)
+            ->send()
+        ;
 
         return $this->_user;
     }
