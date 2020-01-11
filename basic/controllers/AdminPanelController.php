@@ -91,12 +91,18 @@ class AdminPanelController extends Controller
      * @return Response|string
      *
      * @throws Exception
+     * @throws \yii\base\Exception
      */
     public function actionCreate()
     {
         $model = new User(['scenario' => User::SCENARIO_CREATE]);
+        $model->generateAuthKey();
+        $model->generateResetKey();
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $this->editPerms($model);
+            $model->setPassword($model->password);
+            $model->save();
 
             return $this->redirect(['view', 'id' => $model->id]);
         }
@@ -120,13 +126,21 @@ class AdminPanelController extends Controller
      *
      * @throws NotFoundHttpException if the model cannot be found
      * @throws Exception
+     * @throws \yii\base\Exception
      */
     public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
+        $model->setScenario(User::SCENARIO_UPDATE);
+
+        $oldPassword = $model->password;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($oldPassword != $model->password) {
+                $model->setPassword($model->password);
+            }
             $this->editPerms($model);
+            $model->save();
 
             return $this->redirect(['view', 'id' => $model->id]);
         }

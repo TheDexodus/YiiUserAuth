@@ -12,15 +12,15 @@ use yii\widgets\ActiveForm;
 
 <div class="user-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'update']); ?>
 
-    <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'username')->textInput(['maxlength' => true, 'id' => 'update-username']) ?>
 
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'id' => 'update-email']) ?>
 
-    <?= $form->field($model, 'displayname')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'displayname')->textInput(['maxlength' => true, 'id' => 'update-displayname']) ?>
 
-    <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'password')->passwordInput(['maxlength' => true, 'id' => 'update-password']) ?>
 
     <?= $form->field($model, 'authKey')->textInput(['maxlength' => true]) ?>
 

@@ -32,6 +32,7 @@ class User extends ActiveRecord implements IdentityInterface
     const SCENARIO_LOGIN    = 'login';
     const SCENARIO_REGISTER = 'register';
     const SCENARIO_CREATE   = 'create';
+    const SCENARIO_UPDATE   = 'update';
 
     /**
      * @return array
@@ -49,6 +50,11 @@ class User extends ActiveRecord implements IdentityInterface
                 ['username', 'displayname', 'email', 'password', 'authKey', 'resetKey'],
                 'required',
                 'on' => self::SCENARIO_CREATE,
+            ],
+            [
+                ['username', 'displayname', 'email', 'password', 'authKey', 'resetKey'],
+                'required',
+                'on' => self::SCENARIO_UPDATE,
             ],
         ];
     }

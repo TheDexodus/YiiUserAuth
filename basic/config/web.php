@@ -58,6 +58,7 @@ $config = [
                 'register'          => 'site/register',
                 'retrieve-password' => 'site/retrieve-password',
                 'change-password'   => 'site/change-password',
+                'confirm-email'     => 'site/confirm-email',
             ],
         ],
         'authClientCollection' => [
